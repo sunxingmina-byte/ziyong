@@ -8,7 +8,7 @@ SOURCE_URL = "https://sub.cmliussss.net/vpngate?token=20260924233538"
 
 OUTPUT_FILE = Path("vpngate.txt")
 
-PREFIX = "cf.877774.xyz:443$"
+PREFIX = "cf.877774.xyz:443#vpngate$"
 
 # 最大允许下载 5 MB
 MAX_RESPONSE_SIZE = 5 * 1024 * 1024

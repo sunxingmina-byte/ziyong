@@ -3,13 +3,11 @@ name: Update VPNGate TXT
 on:
   schedule:
     # 每 6 小时运行一次
-    # GitHub 使用 UTC 时间
-    - cron: "0 */6 * * *"
+    - cron: "17 */6 * * *"
 
   # 支持手动运行
   workflow_dispatch:
 
-# 只允许这个 Workflow 修改仓库内容
 permissions:
   contents: write
 
@@ -18,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -30,22 +29,25 @@ jobs:
         run: |
           python fetch.py
 
-      - name: Check generated file
+      - name: Check generated files
         run: |
           echo "===== vpngate.txt ====="
           wc -l vpngate.txt
-          head -n 3 vpngate.txt
-          echo "======================="
+          head -n 5 vpngate.txt
+
+          echo ""
+          echo "===== geo_cache.json ====="
+          wc -l geo_cache.json
 
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add vpngate.txt
+          git add vpngate.txt geo_cache.json
 
           if git diff --cached --quiet; then
-            echo "No changes detected."
+            echo "没有数据变化，不创建 commit。"
           else
             git commit -m "Update VPNGate data"
             git push

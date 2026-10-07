@@ -3,7 +3,7 @@ from pathlib import Path
 
 SOURCE_URL = "https://sub.cmliussss.net/vpngate?token=20260924233538"
 OUTPUT_FILE = Path("vpngate.txt")
-PREFIX = "cf.877774.xyz:443$"
+PREFIX = "cf.877774.xyz:443#vpngate$"
 
 
 def fetch_data():

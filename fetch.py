@@ -16,7 +16,7 @@ OUTPUT_FILE = Path("vpngate.txt")
 CACHE_FILE = Path("geo_cache.json")
 
 # 多优选域名列表 (你可以继续添加)
-PREF_DOMAINS = ["cf.877774.xyz:443","saas.sin.fan:443"] 
+PREF_DOMAINS = ["cf.877774.xyz:443","saas.sin.fan:443","www.shopify.com"] 
 
 MAX_RESPONSE_SIZE = 5 * 1024 * 1024
 TIMEOUT = 20

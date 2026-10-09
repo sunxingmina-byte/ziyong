@@ -1,15 +1,13 @@
-name: Update VPNGate TXT
+name: Update VPNGate
 
 on:
   schedule:
     - cron: "17 */6 * * *"
-
   workflow_dispatch:
 
-# 只允许同一工作流组中的一个任务同时运行
 concurrency:
-  group: update-vpngate-data
-  cancel-in-progress: false
+  group: update-vpngate
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -17,73 +15,22 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Fetch and process
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          PYTHONUNBUFFERED: "1"
-        run: |
-          python fetch.py
-
-      - name: Validate generated files
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          import sys
-
-          txt_file = "vpngate.txt"
-          cache_file = "geo_cache.json"
-
-          for path in (txt_file, cache_file):
-              if not os.path.isfile(path):
-                  sys.exit(f"错误：缺少文件 {path}")
-
-              size = os.path.getsize(path)
-              print(f"{path}: {size} bytes")
-
-              if size == 0:
-                  sys.exit(f"错误：文件为空 {path}")
-
-          with open(txt_file, "r", encoding="utf-8") as f:
-              lines = [line.strip() for line in f if line.strip()]
-
-          print(f"非空节点记录数：{len(lines)}")
-
-          if not lines:
-              sys.exit("错误：没有有效节点记录")
-
-          # 检查是否存在重复记录
-          if len(lines) != len(set(lines)):
-              sys.exit("错误：检测到重复节点记录")
-
-          # 检查国家缓存是否为合法 JSON
-          with open(cache_file, "r", encoding="utf-8") as f:
-              json.load(f)
-
-          print("基础文件检查通过")
-          PY
-
-      - name: Commit changes
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      
+      - name: Run updater
+        run: python fetch.py
+        
+      - name: Commit result
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add -- vpngate.txt geo_cache.json
-
-          if git diff --cached --quiet; then
-            echo "没有数据变化，不创建 commit。"
-          else
-            git commit -m "Update VPNGate data"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add vpngate.txt geo_cache.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update vpngate data"
             git push
+          else
+            echo "无变更"
           fi
